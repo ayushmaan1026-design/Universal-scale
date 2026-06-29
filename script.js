@@ -1,64 +1,166 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const slider = document.getElementById('scale-slider');
-    const engine = document.getElementById('engine');
-    const nameDisplay = document.getElementById('object-name');
-    const sizeDisplay = document.getElementById('object-size');
-    const nodes = document.querySelectorAll('.cosmic-node');
+/* Core Layout Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
 
-    // High precision dataset mapping exponent to metrics
-    const universeData = {
-        "-15": { name: "Quark", metric: "0.000000000000001 meters (10⁻¹⁵ m)" },
-        "-10": { name: "Atom (Hydrogen)", metric: "0.0000000001 meters (10⁻¹⁰ m)" },
-        "-6":  { name: "Human Cell", metric: "0.000005 meters (10⁻⁶ m)" },
-        "0":   { name: "Human Being", metric: "1.7 meters (10⁰ m)" },
-        "3":   { name: "Mount Everest", metric: "8,848 meters (10³ m)" },
-        "6":   { name: "Planet Earth", metric: "12,742,000 meters (10⁶ m)" },
-        "9":   { name: "The Sun", metric: "1,392,700,000 meters (10⁹ m)" },
-        "15":  { name: "Milky Way Galaxy", metric: "9.46 × 10¹⁷ meters (10¹⁵ m)" }
-    };
+body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+}
 
-    function processScaleTransform() {
-        const sliderValue = parseFloat(slider.value);
-        
-        // Logarithmic conversion multiplier for consistent zoom performance
-        const scaleFactor = Math.pow(10, -sliderValue);
-        engine.style.transform = `scale(${scaleFactor})`;
+/* Fixed HUD Controller Layer */
+.hud-display {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    text-align: center;
+    background: rgba(10, 10, 10, 0.85);
+    padding: 16px 24px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    width: 90%;
+    max-width: 460px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+}
 
-        let targetedNode = null;
-        let minimumExponentDistance = Infinity;
+#object-name {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #00f3ff;
+}
 
-        nodes.forEach(node => {
-            const nodeExponent = parseFloat(node.getAttribute('data-exponent'));
-            const exponentDistance = Math.abs(sliderValue - nodeExponent);
+#object-size {
+    font-size: 14px;
+    color: #8a8a93;
+    margin: 4px 0 16px 0;
+}
 
-            // Dynamically clip/fade nodes out of view to optimize mobile render performance
-            if (exponentDistance < 3.5) {
-                // Smooth fade window calculation
-                node.style.opacity = (1 - (exponentDistance / 3.5)).toString();
-                node.style.pointerEvents = "auto";
-            } else {
-                node.style.opacity = "0";
-                node.style.pointerEvents = "none";
-            }
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
 
-            // Identify active display metadata
-            if (exponentDistance < minimumExponentDistance) {
-                minimumExponentDistance = exponentDistance;
-                targetedNode = universeData[nodeExponent.toString()];
-            }
-        });
+.endpoint-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #555559;
+    user-select: none;
+}
 
-        // Safe DOM updates
-        if (targetedNode) {
-            nameDisplay.textContent = targetedNode.name;
-            sizeDisplay.textContent = `Size: ${targetedNode.metric}`;
-        }
+/* Custom Interactive Range Input Track */
+#scale-slider {
+    flex-grow: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    height: 6px;
+    background: #1c1c1e;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+#scale-slider::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 12px #00f3ff;
+    cursor: pointer;
+}
+
+#scale-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 12px #00f3ff;
+    cursor: pointer;
+}
+
+/* Master Viewport Wrapper */
+.universe-canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+/* Hardware Accelerated Animation Core */
+.zoom-engine {
+    position: relative;
+    width: 1px;
+    height: 1px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    will-change: transform;
+    transform-style: preserve-3d;
+}
+
+/* Dynamic Asset Element Nodes */
+.cosmic-node {
+    position: absolute;
+    width: var(--node-diameter);
+    height: var(--node-diameter);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Transparent Graphic Rendering Rules */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.node-title {
+    position: absolute;
+    bottom: -28px;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0.9);
+    color: #ffffff;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    pointer-events: none;
+}
+
+/* Mobile Layout Adaptation overrides */
+@media (max-width: 480px) {
+    .hud-display {
+        padding: 12px 16px;
     }
+    #object-name {
+        font-size: 20px;
+    }
+    .node-title {
+        font-size: 11px;
+        padding: 2px 8px;
+    }
+        }
 
-    // High frequency performance handlers
-    slider.addEventListener('input', processScaleTransform);
-    slider.addEventListener('touchmove', processScaleTransform, { passive: true });
-
-    // Bootstrap execution
-    processScaleTransform();
-});
