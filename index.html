@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Scale of the Universe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="hud-display">
+        <h1 id="object-name">Human Being</h1>
+        <p id="object-size">Size: 1.7 meters (10⁰ m)</p>
+        
+        <div class="slider-container">
+            <span class="endpoint-label">Quantum</span>
+            <input type="range" id="scale-slider" min="-15" max="15" step="0.05" value="0">
+            <span class="endpoint-label">Cosmic</span>
+        </div>
+    </div>
+
+    <main class="universe-canvas">
+        <div class="zoom-engine" id="engine">
+            
+            <div class="cosmic-node" data-exponent="-15" style="--node-diameter: 12px; background: #ff4757;">
+                <span class="node-title">Quark</span>
+            </div>
+            <div class="cosmic-node" data-exponent="-10" style="--node-diameter: 40px; background: #ffa502;">
+                <span class="node-title">Atom</span>
+            </div>
+            <div class="cosmic-node" data-exponent="-6" style="--node-diameter: 90px; background: #2ed573;">
+                <span class="node-title">Human Cell</span>
+            </div>
+
+            <div class="cosmic-node" data-exponent="0" style="--node-diameter: 180px; background: #1e90ff;">
+                <span class="node-title">Human</span>
+            </div>
+
+            <div class="cosmic-node" data-exponent="3" style="--node-diameter: 320px; background: #9b59b6;">
+                <span class="node-title">Mt. Everest</span>
+            </div>
+            <div class="cosmic-node" data-exponent="6" style="--node-diameter: 650px; background: #22a6b3; border: 2px solid #ffffff;">
+                <span class="node-title">Earth</span>
+            </div>
+            <div class="cosmic-node" data-exponent="9" style="--node-diameter: 1300px; background: #f1c40f;">
+                <span class="node-title">The Sun</span>
+            </div>
+            <div class="cosmic-node" data-exponent="15" style="--node-diameter: 2800px; background: rgba(255,255,255,0.03); border: 4px dashed rgba(255,255,255,0.4);">
+                <span class="node-title">Milky Way</span>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
